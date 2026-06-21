@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  /* PRIMARY: White / cream world */
+  --cream:       #F2EDE4;
+  --cream-mid:   #E8E0D4;
+  --ink:         #0E0E0E;
+  --ink-soft:    #1A1A1A;
+  --ink-50:      rgba(14,14,14,0.5);
+  --ink-20:      rgba(14,14,14,0.2);
+  --ink-08:      rgba(14,14,14,0.08);
+  --gold:        #BFA05A;
+  --gold-dim:    rgba(191,160,90,0.35);
+
+  /* Accent dark sections */
+  --dark:        #0A0C14;
+  --dark-mid:    #111520;
+  --white:       #FFFFFF;
+  --white-60:    rgba(255,255,255,0.6);
+  --white-20:    rgba(255,255,255,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body { overflow-x: hidden; max-width: 100%; }
+* { cursor: none !important; }
+
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+::selection { background: var(--ink); color: var(--cream); }
+
+/* Font helpers */
+.f-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.f-body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 400;
+}
+.f-label {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+/* ── Responsive tokens ── */
+@media (max-width: 768px) {
+  :root {
+    --section-px: 24px;
+    --section-py: 64px;
+    --pinned-height: auto;
+  }
+  * { cursor: auto !important; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --section-px: 48px;
+    --section-py: 80px;
+  }
+}
+
+/* Hide cursor on touch */
+@media (hover: none) {
+  .c-dot, .c-ring { display: none !important; }
+}
+
+/* Hide year on tiny screens */
+@media (max-width: 480px) {
+  :root { --year-display: none; }
+}
+
+/* Hide menu right panel on tablet/mobile */
+@media (max-width: 1024px) {
+  :root { --menu-panel-display: none; }
+}
+
+/* Hide sub-label on small screens */
+@media (max-width: 640px) {
+  :root { --sub-label-display: none; }
+}
