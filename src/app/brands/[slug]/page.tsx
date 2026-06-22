@@ -176,7 +176,7 @@ export default function BrandPDP() {
           <div>
             {/* section label */}
             <div data-reveal style={{ opacity: 0, display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '32px' }}>
-              <span style={{ fontSize: '7px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.8 }}>
+              <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9 }}>
                 About
               </span>
               <div style={{ flex: 1, height: '1px', background: 'rgba(14,14,14,0.1)' }} />
@@ -199,7 +199,7 @@ export default function BrandPDP() {
 
             {/* facts */}
             <div data-reveal style={{ opacity: 0 }}>
-              <div style={{ fontSize: '7px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.8, marginBottom: '20px' }}>
+              <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9, marginBottom: '20px' }}>
                 Key Facts
               </div>
               <div style={{
@@ -265,7 +265,7 @@ export default function BrandPDP() {
       {brand.galleryImgs.length > 0 && (
         <div style={{ background: '#080A10', padding: 'clamp(48px,8vh,80px) clamp(24px,6vw,80px)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: 'clamp(28px,4vh,44px)' }}>
-            <span style={{ fontSize: '7px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.7 }}>Gallery</span>
+            <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9 }}>Gallery</span>
             <div style={{ flex: 1, height: '1px', background: 'rgba(242,237,228,0.06)' }} />
           </div>
 

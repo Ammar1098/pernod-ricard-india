@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Nav from '@/components/ui/Nav'
+import gsap from 'gsap'
 
 /* ── CONFIG ── */
 const TOTAL_FRAMES       = 240
@@ -13,14 +14,59 @@ const pad      = (n: number, d: number) => String(n).padStart(d, '0')
 const frameUrl = (n: number) =>
   `/frames/seq-01/${FRAME_PREFIX}${pad(n, FRAME_PAD)}${FRAME_SUFFIX}`
 
+/*
+  ── 4-STEP SCROLL TEXT ANIMATION ──
+
+  Progress bands (p = frame / 239):
+
+  Step 1  [0.00 – 0.28]   CRAFT at bottom-left, static
+  Step 2  [0.28 – 0.52]   CRAFT moves upward (~60-70% of viewport)
+  Xfade   [0.52 – 0.68]   CRAFT continues up + fades out;
+                           SINCE 1993 fades in at original bottom-left
+  Step 4  [0.68 – 0.87]   SINCE 1993 moves upward (~60-70% of viewport)
+  Step 5  [0.87 – 1.00]   SINCE 1993 reaches vertical center, holds
+
+  The hint ("Scroll to discover") fades out as soon as scrolling begins.
+*/
+
+const GSAP_OPTS = { duration: 0.85, ease: 'power2.out', overwrite: 'auto' as const }
+
+function calcText(p: number): { op: number; ty: number } {
+  if (p <= 0.28) {
+    return { op: 1, ty: 0 }
+  } else if (p <= 0.52) {
+    const t = (p - 0.28) / 0.24
+    return { op: 1, ty: -30 * t }                   // 0 → -30vh
+  } else if (p <= 0.68) {
+    const t = (p - 0.52) / 0.16
+    return { op: 1 - t, ty: -30 - 10 * t }          // -30 → -40vh, fades out
+  } else {
+    return { op: 0, ty: -40 }
+  }
+}
+
+function calcSub(p: number): { op: number; ty: number } {
+  if (p < 0.52) {
+    return { op: 0, ty: 8 }                          // hidden, slightly below origin
+  } else if (p <= 0.68) {
+    const t = (p - 0.52) / 0.16
+    return { op: t, ty: 8 * (1 - t) }               // fades in, rises from +8 → 0
+  } else if (p <= 0.87) {
+    const t = (p - 0.68) / 0.19
+    return { op: 1, ty: -30 * t }                    // 0 → -30vh
+  } else {
+    const t = (p - 0.87) / 0.13
+    return { op: 1, ty: -30 - 10 * t }              // -30 → -40vh (toward center)
+  }
+}
+
 export default function FrameSequenceSection() {
   const canvasRef   = useRef<HTMLCanvasElement>(null)
   const textRef     = useRef<HTMLDivElement>(null)
   const subTextRef  = useRef<HTMLDivElement>(null)
+  const hintRef     = useRef<HTMLDivElement>(null)
   const framesRef   = useRef<(HTMLImageElement | null)[]>(Array(TOTAL_FRAMES).fill(null))
   const frameIdxRef  = useRef(0)
-  // Prevents Lenis accumulation: once we release at frame 239, block all
-  // subsequent wheel events until scrollY actually moves past 10px.
   const releasedRef  = useRef(false)
 
   const [ready,   setReady]   = useState(false)
@@ -55,20 +101,26 @@ export default function FrameSequenceSection() {
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh)
   }
 
+  /* ── 4-STEP SCROLL ANIMATION ── */
   const updateOverlays = (idx: number) => {
     const p = idx / (TOTAL_FRAMES - 1)
-    if (textRef.current) {
-      let op = 1
-      if      (p >= 0.10 && p < 0.16) op = 1 - (p - 0.10) / 0.06
-      else if (p >= 0.16)              op = 0
-      textRef.current.style.opacity = String(Math.max(0, op))
+
+    // Scroll hint: fades out in the first 12% of progress
+    if (hintRef.current) {
+      const hOp = p < 0.06 ? 1 : Math.max(0, 1 - (p - 0.06) / 0.12)
+      gsap.to(hintRef.current, { opacity: hOp, duration: 0.5, ease: 'power1.out', overwrite: 'auto' })
     }
+
+    // CRAFT. CONVIVIALITY.
+    if (textRef.current) {
+      const { op, ty } = calcText(p)
+      gsap.to(textRef.current, { opacity: Math.max(0, op), y: `${ty}vh`, ...GSAP_OPTS })
+    }
+
+    // Since 1993, we have chosen India's finest.
     if (subTextRef.current) {
-      let op = 0
-      if      (p >= 0.14 && p <= 0.18) op = (p - 0.14) / 0.04
-      else if (p > 0.18  && p <= 0.22) op = 1
-      else if (p > 0.22  && p <= 0.26) op = 1 - (p - 0.22) / 0.04
-      subTextRef.current.style.opacity = String(Math.max(0, op))
+      const { op, ty } = calcSub(p)
+      gsap.to(subTextRef.current, { opacity: Math.max(0, op), y: `${ty}vh`, ...GSAP_OPTS })
     }
   }
 
@@ -111,6 +163,14 @@ export default function FrameSequenceSection() {
     first.src = frameUrl(1)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ── SET INITIAL GSAP STATE when ready ── */
+  useEffect(() => {
+    if (!ready) return
+    gsap.set(textRef.current,    { y: 0, opacity: 1 })
+    gsap.set(subTextRef.current, { y: '8vh', opacity: 0 })
+    gsap.set(hintRef.current,    { opacity: 1 })
+  }, [ready])
+
   /* ── WHEEL: device-normalized frame advance, rAF-batched draw ── */
   useEffect(() => {
     if (!ready) return
@@ -127,49 +187,33 @@ export default function FrameSequenceSection() {
       const dir = e.deltaY > 0 ? 1 : -1
       const idx = frameIdxRef.current
 
-      // Page has physically moved — we're in content zone.
-      // Reset the release-lock so a scroll back to top re-enables frame control.
       if (window.scrollY > 10) {
         releasedRef.current = false
         return
       }
 
-      // At start scrolling up: release to Lenis/browser
       if (idx === 0 && dir < 0) return
 
-      // At last frame scrolling down: release exactly ONE event to Lenis so it
-      // starts the scroll animation. Block all subsequent events until scrollY > 10
-      // to prevent Lenis from accumulating hundreds of wheel deltas while it's still
-      // animating the first one (lerp: 0.075 takes ~800 ms to settle).
       if (idx === TOTAL_FRAMES - 1 && dir > 0) {
         if (!releasedRef.current) {
           releasedRef.current = true
-          return  // let this single event reach Lenis
+          return
         }
-        // Already released — block everything until Lenis moves the page
         e.preventDefault()
         e.stopImmediatePropagation()
         return
       }
 
-      // Registered in capture phase so this fires before Lenis's bubble-phase listener.
-      // stopImmediatePropagation prevents Lenis from also moving the page.
       e.preventDefault()
       e.stopImmediatePropagation()
 
-      // Advance proportionally to deltaY so the speed feels natural on every device:
-      // Windows wheel (deltaY≈120) → ~10 frames per click
-      // Mac trackpad  (deltaY≈3–15) → 1 frame per event (many events per gesture = smooth)
       const steps = Math.max(1, Math.round(Math.abs(e.deltaY) / SCROLL_SENSITIVITY))
       frameIdxRef.current = Math.max(0, Math.min(TOTAL_FRAMES - 1, idx + dir * steps))
 
-      // Batch canvas draws: cancel any pending rAF and schedule a fresh one.
-      // No matter how many wheel events fire between frames, we draw exactly once per frame.
       if (rafId) cancelAnimationFrame(rafId)
       rafId = requestAnimationFrame(render)
     }
 
-    // capture: true — fires before Lenis which listens in the bubble phase
     window.addEventListener('wheel', onWheel, { passive: false, capture: true })
     return () => {
       window.removeEventListener('wheel', onWheel, { capture: true })
@@ -179,10 +223,7 @@ export default function FrameSequenceSection() {
 
   return (
     <>
-      {/*
-        Fixed canvas — sits BEHIND all page content (zIndex: 0).
-        Sections with opaque backgrounds naturally cover it.
-      */}
+      {/* Fixed canvas — sits BEHIND all page content */}
       <div style={{
         position: 'fixed',
         inset: 0,
@@ -208,7 +249,7 @@ export default function FrameSequenceSection() {
             rgba(10,12,20,0.85) 100%
           )`,
         }} />
-        {/* BOTTOM-LEFT VIGNETTE — softens the area behind the hero text */}
+        {/* BOTTOM-LEFT VIGNETTE */}
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'radial-gradient(ellipse 70% 60% at 0% 100%, rgba(10,12,20,0.62) 0%, rgba(10,12,20,0.18) 55%, transparent 100%)',
@@ -222,7 +263,7 @@ export default function FrameSequenceSection() {
         )}
       </div>
 
-      {/* Loading screen — shown while first frame is fetching */}
+      {/* Loading screen */}
       {!ready && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 50,
@@ -239,10 +280,7 @@ export default function FrameSequenceSection() {
         </div>
       )}
 
-      {/*
-        Hero content — fixed, only visible at page top.
-        Text opacity is driven directly from frame index in updateOverlays().
-      */}
+      {/* Hero overlay — fixed, sits above canvas */}
       <div style={{
         position: 'fixed',
         inset: 0,
@@ -254,16 +292,18 @@ export default function FrameSequenceSection() {
           <Nav />
         </div>
 
-        {/* HERO HEADLINE */}
+        {/*
+          STEP 1-3 TEXT: CRAFT. CONVIVIALITY.
+          GSAP controls y (translateY) and opacity via updateOverlays().
+          Initial state: bottom-left, fully visible.
+        */}
         <div ref={textRef} style={{
           position: 'absolute',
           bottom: 'clamp(60px,10vh,120px)',
           left: 'clamp(32px,6vw,80px)',
           pointerEvents: 'none',
+          willChange: 'transform, opacity',
         }}>
-          <div style={{ fontSize: 'clamp(11px, 1.2vw, 15px)', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#D4AA5A', marginBottom: '20px', fontFamily: 'var(--font-body)' }}>
-            Créateurs de convivialité · India · Est. 1993
-          </div>
           <h1 style={{
             fontFamily: 'var(--font-display)',
             fontSize: 'clamp(64px,13vw,180px)',
@@ -275,7 +315,13 @@ export default function FrameSequenceSection() {
               CONVIVIALITY.
             </span>
           </h1>
-          <div style={{ marginTop: '36px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+          {/* Scroll hint — fades out when scrolling begins */}
+          <div ref={hintRef} style={{
+            marginTop: '36px',
+            display: 'flex', alignItems: 'center', gap: '12px',
+            willChange: 'opacity',
+          }}>
             <div style={{ width: '32px', height: '1px', background: '#BFA05A', animation: 'grow 2s ease-in-out infinite' }} />
             <span style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)' }}>
               Scroll to discover
@@ -283,7 +329,11 @@ export default function FrameSequenceSection() {
           </div>
         </div>
 
-        {/* MID TEXT */}
+        {/*
+          STEP 3-5 TEXT: Since 1993…
+          Starts hidden at y=+8vh (slightly below natural bottom-left position).
+          GSAP fades it in and moves it upward.
+        */}
         <div ref={subTextRef} style={{
           position: 'absolute',
           bottom: 'clamp(60px,10vh,120px)',
@@ -291,6 +341,7 @@ export default function FrameSequenceSection() {
           opacity: 0,
           pointerEvents: 'none',
           maxWidth: '560px',
+          willChange: 'transform, opacity',
         }}>
           <p style={{
             fontFamily: 'var(--font-display)',
@@ -299,23 +350,20 @@ export default function FrameSequenceSection() {
             color: '#F2EDE4', margin: 0, textShadow: '0 2px 30px rgba(0,0,0,0.5)',
           }}>
             Since 1993, we have<br />
-            chosen <em style={{ fontStyle: 'italic', color: '#BFA05A' }}>India's finest.</em>
+            chosen <em style={{ fontStyle: 'italic', color: '#BFA05A' }}>India&apos;s finest.</em>
           </p>
         </div>
 
-        {/* YEAR */}
+        {/* YEAR — bottom right */}
         <div style={{
           position: 'absolute', bottom: 'clamp(24px,4vh,40px)', right: 'clamp(24px,5vw,48px)',
-          fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(242,237,228,0.25)',
+          fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(242,237,228,0.25)', fontWeight: 700,
         }}>
           Since 1993
         </div>
       </div>
 
-      {/*
-        Spacer — gives the hero a full viewport of breathing room at the top.
-        Content sections start below this, scrollable once frame 239 is reached.
-      */}
+      {/* Spacer — gives the hero a viewport of space before page content */}
       <div style={{ height: '100vh', position: 'relative', zIndex: 20 }} />
 
       <style>{`

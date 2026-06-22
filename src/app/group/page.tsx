@@ -229,7 +229,7 @@ export default function GroupPage() {
         <div style={{ height: '1px', background: 'rgba(14,14,14,0.1)', marginBottom: 'clamp(28px,4vh,44px)' }} />
 
         <div data-hlabel style={{ opacity: 0, marginBottom: '14px' }}>
-          <span style={{ fontSize: '8px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A' }}>
+          <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A' }}>
             Pernod Ricard India · Our Group
           </span>
         </div>
@@ -295,7 +295,7 @@ export default function GroupPage() {
           alignItems: 'start',
         }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 28px' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 28px' }}>
               Who we are
             </p>
             <div style={{
@@ -338,7 +338,7 @@ export default function GroupPage() {
       {/* ── CORE VALUES — 2×2 dark card grid ── */}
       <div style={{ background: '#0E0E0E', borderTop: '1px solid rgba(242,237,228,0.06)' }}>
         <div style={{ padding: 'clamp(40px,5vh,56px) clamp(24px,6vw,80px) 0' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             What we stand for
           </p>
         </div>
@@ -376,7 +376,7 @@ export default function GroupPage() {
           justifyContent: 'space-between', flexWrap: 'wrap',
           gap: '24px', marginBottom: 'clamp(44px,7vh,80px)',
         }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             How we operate
           </p>
           <p style={{
@@ -437,7 +437,7 @@ export default function GroupPage() {
           padding: 'clamp(80px,12vh,140px) clamp(24px,6vw,80px)',
         }}
       >
-        <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 clamp(44px,7vh,80px)' }}>
+        <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 clamp(44px,7vh,80px)' }}>
           By the numbers
         </p>
         <div style={{
@@ -481,7 +481,7 @@ export default function GroupPage() {
           gap: '24px', marginBottom: 'clamp(44px,6vh,64px)',
         }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 14px' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 14px' }}>
               A house of brands
             </p>
             <div style={{
@@ -526,7 +526,7 @@ export default function GroupPage() {
         textAlign: 'center',
         overflow: 'hidden',
       }}>
-        <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 clamp(20px,3vh,32px)' }}>
+        <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 clamp(20px,3vh,32px)' }}>
           The Pernod Ricard group
         </p>
         <div style={{

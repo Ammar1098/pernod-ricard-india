@@ -1,10 +1,27 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Nav from '@/components/ui/Nav'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SLUG_BY_NAME } from '@/data/brands'
+import { SLUG_BY_NAME, BRAND_DATA } from '@/data/brands'
+
+/* local logos served from /public/logos/ — designed for light backgrounds */
+const LOCAL_LOGOS: Record<string, string> = {
+  'Absolut':        '/logos/absolut.png',
+  'Beefeater':      '/logos/beefeater.png',
+  'Blenders Pride': '/logos/blenders-pride.png',
+  'Chivas Regal':   '/logos/chivas-regal.png',
+  'Havana Club':    '/logos/havana-club.png',
+  'Imperial Blue':  '/logos/imperial-blue.png',
+  'Jameson':        '/logos/jameson.png',
+  'Martell':        '/logos/martell.png',
+  'Royal Stag':     '/logos/royal-stag.png',
+  "Seagram's":      '/logos/seagrams.png',
+  'The Glenlivet':  '/logos/the-glenlivet.png',
+  '100 Pipers':     '/logos/100-pipers.png',
+}
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -122,17 +139,17 @@ function GridTile({ name, cat, year, img, gridCol, gridRow, priority }: typeof F
       }}
     >
       {/* image */}
-      <img
+      <Image
         ref={imgEl}
         src={img}
         alt={name}
-        decoding="async"
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        {...(priority ? { fetchPriority: 'high' } : { loading: 'lazy' }) as any}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        quality={65}
+        priority={priority}
         onLoad={() => setImgLoaded(true)}
         style={{
-          width: '100%', height: '100%',
-          objectFit: 'cover', display: 'block',
+          objectFit: 'cover',
           transformOrigin: 'center center',
           opacity: imgLoaded ? 1 : 0,
           transition: 'opacity 0.6s ease',
@@ -241,6 +258,10 @@ export default function BrandsPage() {
   const glanceRef  = useRef<HTMLElement>(null)
   const widerRef   = useRef<HTMLElement>(null)
 
+  /* first category open by default */
+  const [openCat, setOpenCat] = useState<string>(BY_CAT[0]?.cat ?? '')
+  const toggleCat = (cat: string) => setOpenCat(prev => prev === cat ? '' : cat)
+
   /* ── page fade-in ── */
   useEffect(() => {
     if (!pageRef.current) return
@@ -289,26 +310,15 @@ export default function BrandsPage() {
     )
   }, [])
 
-  /* ── wider: category rows + individual cells ── */
+  /* ── wider section entrance ── */
   useEffect(() => {
     if (!widerRef.current) return
-
-    gsap.fromTo(widerRef.current.querySelectorAll('[data-cat-row]'),
-      { opacity: 0, y: 20 },
+    gsap.fromTo(widerRef.current.querySelectorAll('[data-accordion-row]'),
+      { opacity: 0, y: 16 },
       {
         opacity: 1, y: 0,
-        duration: 0.6, ease: 'power3.out', stagger: 0.07,
+        duration: 0.5, ease: 'power3.out', stagger: 0.05,
         scrollTrigger: { trigger: widerRef.current, start: 'top 85%' },
-      }
-    )
-
-    gsap.fromTo(widerRef.current.querySelectorAll('[data-brand-cell]'),
-      { opacity: 0, y: 10 },
-      {
-        opacity: 1, y: 0,
-        duration: 0.45, ease: 'power2.out',
-        stagger: { each: 0.025, from: 'start' },
-        scrollTrigger: { trigger: widerRef.current, start: 'top 80%' },
       }
     )
   }, [])
@@ -319,6 +329,10 @@ export default function BrandsPage() {
         @keyframes shimmer {
           0%   { background-position: 200% 0; }
           100% { background-position: -200% 0; }
+        }
+        @keyframes cardFadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
@@ -333,7 +347,7 @@ export default function BrandsPage() {
           overflow: 'hidden',
         }}>
           <div data-label style={{ opacity: 0, marginBottom: '18px' }}>
-            <span style={{ fontSize: '9px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.8 }}>
+            <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9 }}>
               Pernod Ricard India · Portfolio
             </span>
           </div>
@@ -398,7 +412,7 @@ export default function BrandsPage() {
           borderTop: '1px solid rgba(14,14,14,0.08)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: 'clamp(40px,6vh,64px)' }}>
-            <span style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.8 }}>
+            <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9 }}>
               Portfolio
             </span>
             <div style={{ flex: 1, height: '1px', background: 'rgba(14,14,14,0.08)' }} />
@@ -503,7 +517,7 @@ export default function BrandsPage() {
         <section ref={widerRef} style={{ background: '#F2EDE4', borderTop: '1px solid rgba(14,14,14,0.08)' }}>
           {/* intro */}
           <div style={{ padding: 'clamp(64px,10vh,100px) clamp(24px,6vw,80px) clamp(40px,6vh,64px)' }}>
-            <div style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', opacity: 0.8, marginBottom: '18px' }}>
+            <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', opacity: 0.9, marginBottom: '18px' }}>
               The wider group
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
@@ -522,49 +536,18 @@ export default function BrandsPage() {
             </div>
           </div>
 
-          {/* category blocks */}
-          {BY_CAT.map((group, gi) => (
-            <div
-              key={group.cat}
-              data-cat-row
-              style={{ opacity: 0, borderTop: '1px solid rgba(14,14,14,0.08)' }}
-            >
-              <div style={{
-                padding: 'clamp(20px,3vh,28px) clamp(24px,6vw,80px)',
-                display: 'flex', alignItems: 'center', gap: '20px',
-                background: gi % 2 === 0 ? '#F2EDE4' : 'rgba(14,14,14,0.02)',
-              }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '11px', letterSpacing: '0.08em', color: 'rgba(191,160,90,0.45)' }}>
-                  {String(gi + 1).padStart(2, '0')}
-                </span>
-                <div style={{ width: '20px', height: '1px', background: '#BFA05A', opacity: 0.3 }} />
-                <h3 style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(18px,2vw,26px)',
-                  fontWeight: 300, letterSpacing: '-0.01em',
-                  color: '#0E0E0E', margin: 0, flex: 1,
-                }}>
-                  {group.cat}
-                </h3>
-                <span style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(14,14,14,0.3)', textTransform: 'uppercase' }}>
-                  {group.brands.length} brand{group.brands.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(150px,20vw,210px), 1fr))',
-                gap: '1px',
-                background: 'rgba(14,14,14,0.07)',
-                margin: '0 clamp(24px,6vw,80px)',
-                marginBottom: 'clamp(24px,4vh,36px)',
-              }}>
-                {group.brands.map(b => (
-                  <BrandCell key={b.name} name={b.name} cat={group.cat} />
-                ))}
-              </div>
-            </div>
-          ))}
+          {/* accordion rows */}
+          <div style={{ borderTop: '1px solid rgba(14,14,14,0.1)' }}>
+            {BY_CAT.map((group, gi) => (
+              <AccordionCat
+                key={group.cat}
+                group={group}
+                index={gi}
+                isOpen={openCat === group.cat}
+                onToggle={() => toggleCat(group.cat)}
+              />
+            ))}
+          </div>
 
           <div style={{ height: 'clamp(48px,7vh,80px)' }} />
         </section>
@@ -617,67 +600,214 @@ function StaticRow({ style, children }: { style: React.CSSProperties; children: 
   return <div data-row style={style}>{children}</div>
 }
 
-/* ── BRAND CELL ── */
-function BrandCell({ name, cat }: { name: string; cat: string }) {
+/* ── BRAND CARD (inside accordion) ── */
+function BrandCard({ name, cat, animDelay }: { name: string; cat: string; animDelay: number }) {
   const [hov, setHov] = useState(false)
   const slug = SLUG_BY_NAME[name]
+  const logo = LOCAL_LOGOS[name] ?? null
 
-  const inner = (
+  const card = (
     <div
-      data-brand-cell
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        padding: 'clamp(18px,2.5vh,24px) clamp(16px,2vw,22px)',
-        background: hov ? '#0E0E0E' : '#F2EDE4',
-        transition: 'background 0.28s ease',
+        border: `1px solid ${hov ? '#C9A96E' : 'rgba(0,0,0,0.08)'}`,
+        borderRadius: '4px',
+        overflow: 'hidden',
+        transition: 'border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease',
+        transform: hov ? 'scale(1.02)' : 'scale(1)',
+        boxShadow: hov ? '0 8px 24px rgba(0,0,0,0.08)' : 'none',
         cursor: slug ? 'pointer' : 'default',
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        height: '100%',
+        animation: 'cardFadeIn 0.3s ease forwards',
+        animationDelay: `${animDelay}s`,
         opacity: 0,
       }}
     >
-      <div>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{
+      {/* image / logo area — consistent light bg for all cards */}
+      <div style={{
+        height: '120px',
+        background: '#f5f1eb',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
+      }}>
+        {logo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logo}
+            alt={name}
+            style={{
+              width: '100%',
+              height: '120px',
+              objectFit: 'contain',
+              padding: '16px',
+              opacity: hov ? 1 : 0.85,
+              transition: 'opacity 0.3s',
+            }}
+          />
+        ) : (
+          <span style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(15px,1.5vw,20px)',
-            fontWeight: 300, letterSpacing: '-0.01em',
-            color: hov ? '#F2EDE4' : '#0E0E0E',
-            transition: 'color 0.28s, transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)',
-            lineHeight: 1.2,
-            transform: hov ? 'translateY(-2px)' : 'translateY(0)',
+            fontSize: '52px',
+            fontWeight: 300,
+            color: hov ? 'rgba(201,169,110,0.55)' : 'rgba(201,169,110,0.35)',
+            lineHeight: 1,
+            transition: 'color 0.3s',
+            userSelect: 'none',
           }}>
-            {name}
-          </div>
+            {name[0]}
+          </span>
+        )}
+      </div>
+
+      {/* info */}
+      <div style={{ padding: '14px 16px 16px', background: '#FDFAF5' }}>
+        <div style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '14px',
+          fontWeight: 300, letterSpacing: '-0.01em', lineHeight: 1.25,
+          color: hov ? '#0E0E0E' : 'rgba(14,14,14,0.85)',
+          marginBottom: '5px',
+          transition: 'color 0.25s',
+        }}>
+          {name}
         </div>
         <div style={{
-          marginTop: '5px',
-          fontSize: '7px', letterSpacing: '0.25em', textTransform: 'uppercase',
-          color: hov ? '#BFA05A' : 'rgba(14,14,14,0.28)',
-          transition: 'color 0.28s',
+          fontSize: '10px', letterSpacing: '0.22em',
+          textTransform: 'uppercase',
+          color: 'rgba(14,14,14,0.35)',
         }}>
           {cat}
         </div>
       </div>
-      {slug && (
-        <div style={{
-          marginTop: '8px',
-          fontSize: '7px', letterSpacing: '0.2em',
-          color: 'rgba(191,160,90,0.7)',
-          opacity: hov ? 1 : 0,
-          transform: hov ? 'translateX(0)' : 'translateX(-6px)',
-          transition: 'opacity 0.25s, transform 0.25s',
-        }}>
-          View →
-        </div>
-      )}
     </div>
   )
 
   return slug ? (
     <Link href={`/brands/${slug}`} style={{ display: 'block', textDecoration: 'none' }}>
-      {inner}
+      {card}
     </Link>
-  ) : inner
+  ) : card
+}
+
+/* ── ACCORDION CATEGORY ROW ── */
+function AccordionCat({
+  group, index, isOpen, onToggle,
+}: {
+  group: { cat: string; brands: { name: string; cat: string }[] }
+  index: number
+  isOpen: boolean
+  onToggle: () => void
+}) {
+  const [hov, setHov] = useState(false)
+
+  return (
+    <div
+      data-accordion-row
+      style={{ borderBottom: '1px solid rgba(14,14,14,0.1)', opacity: 0 }}
+    >
+      {/* trigger row */}
+      <button
+        onClick={onToggle}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={{
+          width: '100%',
+          display: 'flex', alignItems: 'center', gap: '16px',
+          padding: '24px clamp(24px,6vw,80px)',
+          background: 'none', border: 'none',
+          cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        {/* index number */}
+        <span style={{
+          fontFamily: 'var(--font-display)', fontSize: '12px',
+          letterSpacing: '0.1em',
+          color: isOpen ? '#C9A96E' : 'rgba(191,160,90,0.5)',
+          minWidth: '24px', flexShrink: 0,
+          transition: 'color 0.25s',
+        }}>
+          {String(index + 1).padStart(2, '0')}
+        </span>
+
+        {/* dash */}
+        <div style={{
+          width: '18px', height: '1px',
+          background: isOpen ? '#C9A96E' : '#BFA05A',
+          opacity: isOpen ? 0.7 : 0.35,
+          flexShrink: 0, transition: 'opacity 0.25s, background 0.25s',
+        }} />
+
+        {/* category name */}
+        <span style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.8rem',
+          fontWeight: 300, letterSpacing: '-0.02em', lineHeight: 1,
+          color: isOpen || hov ? '#C9A96E' : '#0E0E0E',
+          transition: 'color 0.25s ease',
+          flexShrink: 0,
+        }}>
+          {group.cat}
+        </span>
+
+        {/* dashed spacer fills dead space between title and count */}
+        <div style={{
+          flex: 1,
+          borderBottom: '1px dashed rgba(0,0,0,0.2)',
+          margin: '0 20px',
+          marginBottom: '2px',
+          alignSelf: 'flex-end',
+          opacity: isOpen ? 0.6 : 0.3,
+          transition: 'opacity 0.25s',
+        }} />
+
+        {/* brand count */}
+        <span style={{
+          fontSize: '8px', letterSpacing: '0.25em',
+          color: isOpen ? 'rgba(14,14,14,0.5)' : 'rgba(14,14,14,0.3)',
+          textTransform: 'uppercase', whiteSpace: 'nowrap',
+          flexShrink: 0, transition: 'color 0.25s',
+        }}>
+          {group.brands.length} brand{group.brands.length !== 1 ? 's' : ''}
+        </span>
+
+        {/* toggle icon */}
+        <span style={{
+          fontSize: '22px', lineHeight: 1,
+          color: isOpen ? '#C9A96E' : 'rgba(14,14,14,0.3)',
+          display: 'inline-block',
+          transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+          transition: 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), color 0.25s',
+          flexShrink: 0, marginLeft: '12px',
+          fontFamily: 'var(--font-body)',
+          fontWeight: 300,
+        }}>
+          +
+        </span>
+      </button>
+
+      {/* expandable brand cards */}
+      <div style={{
+        maxHeight: isOpen ? '1400px' : '0px',
+        overflow: 'hidden',
+        transition: 'max-height 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease',
+        opacity: isOpen ? 1 : 0,
+      }}>
+        <div style={{ padding: '8px clamp(24px,6vw,80px) 40px' }}>
+          {/* re-key on every open to replay stagger animation */}
+          <div
+            key={isOpen ? `open-${group.cat}` : 'closed'}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {group.brands.map((b, i) => (
+              <BrandCard key={b.name} name={b.name} cat={b.cat} animDelay={i * 0.05} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

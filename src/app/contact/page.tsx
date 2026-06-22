@@ -46,6 +46,16 @@ const CHANNELS = [
   },
 ]
 
+const SLUG_MAP: Record<string, string> = {
+  'Chivas Regal': 'chivas', 'The Glenlivet': 'the-glenlivet',
+  "Ballantine's": 'ballantines', 'Jameson': 'jameson',
+  'Absolut': 'absolut', 'Beefeater': 'beefeater',
+  'Martell': 'martell', 'Mumm': 'mumm',
+  'Havana Club': 'havana-club', 'Royal Salute': 'royal-salute',
+  'Perrier-Jouët': 'perrier-jouet', 'Redbreast': 'redbreast',
+  'Royal Stag': 'royal-stag', 'Monkey 47': 'monkey-47',
+}
+
 const BRANDS = [
   'Chivas Regal', 'The Glenlivet', "Ballantine's", 'Jameson',
   'Absolut', 'Beefeater', 'Martell', 'Mumm',
@@ -212,7 +222,7 @@ export default function ContactPage() {
         <div style={{ height: '1px', background: 'rgba(14,14,14,0.1)', marginBottom: 'clamp(28px,4vh,44px)' }} />
 
         <div data-label style={{ opacity: 0, marginBottom: '14px' }}>
-          <span style={{ fontSize: '8px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A' }}>
+          <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A' }}>
             Pernod Ricard India · Contact
           </span>
         </div>
@@ -300,7 +310,7 @@ export default function ContactPage() {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(32px,5vh,56px)' }}>
           <div>
             <div data-a style={{ opacity: 0, marginBottom: '14px' }}>
-              <span style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A' }}>
+              <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A' }}>
                 Corporate Office
               </span>
             </div>
@@ -371,7 +381,7 @@ export default function ContactPage() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'clamp(20px,3vh,32px)', gap: '20px', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', marginBottom: '8px' }}>
+            <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', marginBottom: '8px' }}>
               A house of brands
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,2.8vw,40px)', fontWeight: 300, letterSpacing: '-0.02em', color: '#0E0E0E', lineHeight: 1 }}>
@@ -398,8 +408,9 @@ export default function ContactPage() {
         {/* 7 cols × 2 rows = 14 pills, zero orphans */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0', border: '1px solid rgba(14,14,14,0.1)', borderRight: 'none', borderBottom: 'none' }}>
           {BRANDS.map(name => (
-            <div
+            <a
               key={name}
+              href={`/brands/${SLUG_MAP[name]}`}
               data-b
               style={{
                 opacity: 0,
@@ -412,18 +423,19 @@ export default function ContactPage() {
                 color: 'rgba(14,14,14,0.55)',
                 textAlign: 'center',
                 transition: 'background 0.22s, color 0.22s',
+                textDecoration: 'none', display: 'block', cursor: 'pointer',
               }}
               onMouseEnter={e => {
-                const el = e.currentTarget as HTMLDivElement
+                const el = e.currentTarget as HTMLElement
                 el.style.background = '#0E0E0E'; el.style.color = '#F2EDE4'
               }}
               onMouseLeave={e => {
-                const el = e.currentTarget as HTMLDivElement
+                const el = e.currentTarget as HTMLElement
                 el.style.background = 'transparent'; el.style.color = 'rgba(14,14,14,0.55)'
               }}
             >
               {name}
-            </div>
+            </a>
           ))}
         </div>
       </section>

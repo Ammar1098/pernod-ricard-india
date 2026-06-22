@@ -31,6 +31,44 @@ const BOX_H_IDLE   = 0.48
 const BOX_W_ACTIVE = 1.5
 const BOX_H_ACTIVE = 0.72
 
+// Continuous speed: one full orbit in ~33 seconds at 60fps (matches prior avg speed)
+const AUTO_SPEED = 0.003
+
+// ── Center hub — Pernod Ricard India logo always at orbit origin ──
+function CenterHub() {
+  const texture = useTexture('/images/logo-white.png')
+  texture.minFilter = THREE.LinearFilter
+  texture.magFilter = THREE.LinearFilter
+
+  // "Pernod Ricard India" logo with sunburst icon — roughly 2 : 1 (w : h)
+  const HUB_W = 1.60
+  const HUB_H = HUB_W / 2.0
+
+  return (
+    <Billboard position={[0, 0.2, 0]}>
+      {/* logo-white.png has white pixels; multiply by dark color to render
+          on the cream background without a visible circle behind it */}
+      <mesh>
+        <planeGeometry args={[HUB_W, HUB_H]} />
+        <meshBasicMaterial
+          map={texture} transparent opacity={0.70}
+          color="#1A1612" depthWrite={false} alphaTest={0.01}
+        />
+      </mesh>
+    </Billboard>
+  )
+}
+
+function SafeCenterHub() {
+  return (
+    <ErrorBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <CenterHub />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
+
 function fitLogo(ar: number, active: boolean) {
   const bw = active ? BOX_W_ACTIVE : BOX_W_IDLE
   const bh = active ? BOX_H_ACTIVE : BOX_H_IDLE
@@ -57,23 +95,37 @@ function OrbitRing() {
 }
 
 function LogoPlane({
-  slug, india, ar, position, depth, isActive,
+  slug, india, ar, i, angleRef, isActive,
 }: {
-  slug: string; india: boolean; ar: number
-  position: [number, number, number]; depth: number; isActive: boolean
+  slug: string; india: boolean; ar: number; i: number
+  angleRef: React.MutableRefObject<number>; isActive: boolean
 }) {
+  const groupRef  = useRef<THREE.Group>(null)
   const meshRef   = useRef<THREE.Mesh>(null)
   const circleRef = useRef<THREE.Mesh>(null)
   const texture   = useTexture(`/logos/${slug}.png`)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
 
-  const targetOpacity       = THREE.MathUtils.lerp(0.12, 1.0, (depth + 1) / 2)
-  const targetCircleOpacity = THREE.MathUtils.lerp(0.0, isActive ? 0.55 : 0.22, (depth + 1) / 2)
   const { w: planeW, h: planeH } = fitLogo(ar, isActive)
   const circleR = Math.sqrt(planeW * planeW + planeH * planeH) / 2 + 0.08
 
   useFrame(() => {
+    const a     = angleRef.current + (i / N) * Math.PI * 2
+    const depth = Math.cos(a)
+
+    // Update position every frame — smooth continuous movement
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        Math.sin(a) * ORBIT_R,
+        Math.cos(a) * ORBIT_R * ORBIT_TY * -0.6,
+        Math.cos(a) * ORBIT_R * ORBIT_TZ,
+      )
+    }
+
+    const targetOpacity       = THREE.MathUtils.lerp(0.12, 1.0, (depth + 1) / 2)
+    const targetCircleOpacity = THREE.MathUtils.lerp(0.0, isActive ? 0.55 : 0.22, (depth + 1) / 2)
+
     if (meshRef.current) {
       const mat = meshRef.current.material as THREE.MeshBasicMaterial
       mat.opacity = THREE.MathUtils.lerp(mat.opacity, targetOpacity, 0.12)
@@ -85,19 +137,21 @@ function LogoPlane({
   })
 
   return (
-    <Billboard position={position}>
-      <mesh ref={circleRef} position={[0, 0, -0.02]}>
-        <ringGeometry args={[circleR - 0.015, circleR, 64]} />
-        <meshBasicMaterial color="#1A1612" transparent opacity={targetCircleOpacity} depthWrite={false} />
-      </mesh>
-      <mesh ref={meshRef}>
-        <planeGeometry args={[planeW, planeH]} />
-        <meshBasicMaterial
-          map={texture} transparent opacity={targetOpacity}
-          color={india ? '#6B5016' : '#141210'} depthWrite={false} alphaTest={0.01}
-        />
-      </mesh>
-    </Billboard>
+    <group ref={groupRef}>
+      <Billboard>
+        <mesh ref={circleRef} position={[0, 0, -0.02]}>
+          <ringGeometry args={[circleR - 0.015, circleR, 64]} />
+          <meshBasicMaterial color="#1A1612" transparent opacity={0} depthWrite={false} />
+        </mesh>
+        <mesh ref={meshRef}>
+          <planeGeometry args={[planeW, planeH]} />
+          <meshBasicMaterial
+            map={texture} transparent opacity={0.12}
+            color={india ? '#6B5016' : '#141210'} depthWrite={false} alphaTest={0.01}
+          />
+        </mesh>
+      </Billboard>
+    </group>
   )
 }
 
@@ -118,54 +172,33 @@ interface Props {
 }
 
 export default function BrandOrbit({ onBrandChange, dragDelta, isDragging }: Props) {
-  const angleRef     = useRef(0)
-  const targetRef    = useRef(0)
-  const prevDrag     = useRef(0)
-  /* Tracks which brand is visually at the centre — updated every frame */
-  const activeIdxRef = useRef(0)
-  const intervalRef  = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
-  const timeoutRef   = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const angleRef      = useRef(0)
+  const prevDrag      = useRef(0)
+  const isDraggingRef = useRef(false)
+  const activeIdxRef  = useRef(0)
   const [activeIdx, setActiveIdx] = useState(0)
 
-  /* Auto-spin: only advances targetRef — active brand is derived from angleRef in useFrame */
-  const startAutoSpin = useCallback(() => {
-    clearInterval(intervalRef.current)
-    intervalRef.current = setInterval(() => {
-      targetRef.current -= STEP
-    }, 3000)
-  }, [])
-
+  // Sync isDragging bool into a ref accessible from useFrame
   useEffect(() => {
-    startAutoSpin()
-    return () => {
-      clearInterval(intervalRef.current as ReturnType<typeof setInterval>)
-      clearTimeout(timeoutRef.current as ReturnType<typeof setTimeout>)
-    }
-  }, [startAutoSpin])
+    isDraggingRef.current = isDragging
+  }, [isDragging])
 
-  /* Drag: shift target, pause auto-spin */
+  // Apply drag delta directly to angle (no target / snap needed)
   useEffect(() => {
     const delta = dragDelta - prevDrag.current
     prevDrag.current = dragDelta
-    targetRef.current -= delta * 0.012
-    clearInterval(intervalRef.current)
-    clearTimeout(timeoutRef.current)
+    if (delta !== 0) {
+      angleRef.current -= delta * 0.012
+    }
   }, [dragDelta])
 
-  /* Drag release: snap to nearest brand, restart auto-spin */
-  useEffect(() => {
-    if (!isDragging) {
-      const snapped = Math.round(targetRef.current / STEP) * STEP
-      targetRef.current = snapped
-      timeoutRef.current = setTimeout(startAutoSpin, 1500)
-    }
-  }, [isDragging, startAutoSpin])
-
   useFrame(() => {
-    /* Ease orbit toward target */
-    angleRef.current += (targetRef.current - angleRef.current) * 0.07
+    // Continuous auto-spin — no easing, no pausing, constant velocity
+    if (!isDraggingRef.current) {
+      angleRef.current -= AUTO_SPEED
+    }
 
-    /* Detect which brand is visually closest to the front (cos(a) maximum) */
+    // Detect which brand is visually closest to the front (cos max)
     let bestIdx = 0
     let bestCos = -Infinity
     for (let i = 0; i < N; i++) {
@@ -174,7 +207,6 @@ export default function BrandOrbit({ onBrandChange, dragDelta, isDragging }: Pro
       if (c > bestCos) { bestCos = c; bestIdx = i }
     }
 
-    /* Only fire React state update when the centred brand actually changes */
     if (bestIdx !== activeIdxRef.current) {
       activeIdxRef.current = bestIdx
       setActiveIdx(bestIdx)
@@ -185,24 +217,18 @@ export default function BrandOrbit({ onBrandChange, dragDelta, isDragging }: Pro
   return (
     <>
       <OrbitRing />
-      {BRANDS.map((brand, i) => {
-        const a     = angleRef.current + (i / N) * Math.PI * 2
-        const x     = Math.sin(a) * ORBIT_R
-        const z     = Math.cos(a) * ORBIT_R * ORBIT_TZ
-        const y     = Math.cos(a) * ORBIT_R * ORBIT_TY * -0.6
-        const depth = Math.cos(a)
-        return (
-          <SafeLogoPlane
-            key={brand.slug}
-            slug={brand.slug}
-            india={brand.india}
-            ar={brand.ar}
-            position={[x, y, z]}
-            depth={depth}
-            isActive={i === activeIdx}
-          />
-        )
-      })}
+      <SafeCenterHub />
+      {BRANDS.map((brand, i) => (
+        <SafeLogoPlane
+          key={brand.slug}
+          slug={brand.slug}
+          india={brand.india}
+          ar={brand.ar}
+          i={i}
+          angleRef={angleRef}
+          isActive={i === activeIdx}
+        />
+      ))}
     </>
   )
 }

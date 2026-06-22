@@ -5,28 +5,26 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const BASE = 'https://reimagined-succotash-tau.vercel.app'
-
 const pillars = [
   {
     num: '01', word: 'Craft',
     body: 'We make things properly. From sourcing to bottling, quality is the only standard we recognise — across Indian-made and international brands alike.',
-    img: `${BASE}/images/brands/jameson/00-jameson_sa_website.jpg`,
+    img: 'https://images.unsplash.com/photo-1528717384022-f8d665c86909?w=1200&q=80',
   },
   {
     num: '02', word: 'Conviviality',
     body: 'We exist for the moments people share. We market our brands responsibly and ask only that they are enjoyed in good company and good measure.',
-    img: `${BASE}/images/brands/absolut/00-originalsizejpeg-absolut_atlas_lifestyle.jpg`,
+    img: 'https://images.unsplash.com/photo-1542338332-76971ae8c292?w=1200&q=80',
   },
   {
     num: '03', word: 'Responsibility',
     body: 'We hold ourselves to the same standard as our craft: careful with water and soil, fair with people, and honest in how we communicate.',
-    img: `${BASE}/images/brands/chivas/00-previewlarge-chivas-20socialassets-20-20.jpg`,
+    img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&q=80',
   },
   {
     num: '04', word: 'Entrepreneurship',
     body: 'We give our teams the freedom to act like owners. Decentralised by design, accountable by culture.',
-    img: `${BASE}/images/brands/martell/00-brand-martell-cordon-bleu-lifestyle-orig.png`,
+    img: 'https://images.unsplash.com/photo-1504346466600-714572c4b726?w=1200&q=80',
   },
 ]
 
@@ -54,8 +52,8 @@ export default function PhilosophySection() {
       borderTop: '1px solid rgba(14,14,14,0.08)',
     }}>
       <p style={{
-        fontSize: '10px', letterSpacing: '0.3em',
-        textTransform: 'uppercase', color: '#BFA05A',
+        fontSize: '13px', letterSpacing: '0.2em',
+        textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A',
         marginBottom: 'clamp(48px, 8vh, 80px)',
       }}>
         What we stand for

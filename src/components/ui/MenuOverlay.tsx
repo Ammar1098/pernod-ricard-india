@@ -1,14 +1,16 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import Link from 'next/link'
 
+const DEFAULT_IMG = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80'
+
 const items = [
-  { num: '001', label: 'Home',           href: '/',              sub: 'Welcome' },
-  { num: '002', label: 'Our Group',      href: '/group',         sub: 'Who we are' },
-  { num: '003', label: 'Brands',         href: '/brands',        sub: '66+ brands' },
-  { num: '004', label: 'Sustainability', href: '/sustainability', sub: '2030 Roadmap' },
-  { num: '005', label: 'Newsroom',       href: '/news',          sub: 'Latest updates' },
+  { num: '001', label: 'Home',           href: '/',              sub: 'Welcome',        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80' },
+  { num: '002', label: 'Our Group',      href: '/group',         sub: 'Who we are',     img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&q=80' },
+  { num: '003', label: 'Brands',         href: '/brands',        sub: '66+ brands',     img: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=1200&q=80' },
+  { num: '004', label: 'Sustainability', href: '/sustainability', sub: '2030 Roadmap',   img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80' },
+  { num: '005', label: 'Newsroom',       href: '/news',          sub: 'Latest updates', img: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80' },
 ]
 
 interface Props { open: boolean; onClose: () => void }
@@ -16,15 +18,7 @@ interface Props { open: boolean; onClose: () => void }
 export default function MenuOverlay({ open, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const itemsRef   = useRef<(HTMLLIElement | null)[]>([])
-  const activeImg  = useRef<HTMLDivElement>(null)
-
-  const gradients = [
-    'linear-gradient(135deg,#1C2040,#0A0C14)',
-    'linear-gradient(135deg,#2A1A10,#0A0C14)',
-    'linear-gradient(135deg,#0A1A20,#0A0C14)',
-    'linear-gradient(135deg,#1A200A,#0A0C14)',
-    'linear-gradient(135deg,#200A1A,#0A0C14)',
-  ]
+  const [hoveredImg, setHoveredImg] = useState<string | null>(null)
 
   useEffect(() => {
     const overlay = overlayRef.current
@@ -43,6 +37,7 @@ export default function MenuOverlay({ open, onClose }: Props) {
         '-=0.3'
       )
     } else {
+      setHoveredImg(null)
       const tl = gsap.timeline({ onComplete: () => gsap.set(overlay, { display: 'none' }) })
       tl.to(itemsRef.current, { opacity: 0, y: -16, stagger: 0.04, duration: 0.3, ease: 'power2.in' })
       tl.to(overlay,
@@ -94,6 +89,8 @@ export default function MenuOverlay({ open, onClose }: Props) {
             <li
               key={item.href}
               ref={el => { itemsRef.current[i] = el }}
+              onMouseEnter={() => setHoveredImg(item.img)}
+              onMouseLeave={() => setHoveredImg(null)}
               style={{
                 borderBottom: '1px solid rgba(242,237,228,0.08)',
                 padding: 'clamp(20px, 3vh, 28px) 0',
@@ -102,11 +99,6 @@ export default function MenuOverlay({ open, onClose }: Props) {
                 alignItems: 'center',
                 gap: '16px',
                 opacity: 0,
-              }}
-              onMouseEnter={() => {
-                if (activeImg.current) {
-                  activeImg.current.style.background = gradients[i]
-                }
               }}
             >
               <span style={{
@@ -147,80 +139,62 @@ export default function MenuOverlay({ open, onClose }: Props) {
           ))}
         </ul>
 
-        {/* Footer — brand logos + tagline */}
+        {/* Footer — main logo */}
         <div style={{
           marginTop: 'auto',
           paddingTop: '40px',
           borderTop: '1px solid rgba(242,237,228,0.08)',
+          display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px',
         }}>
-          {/* Key brand logo strip */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 'clamp(16px, 3vw, 32px)',
-            flexWrap: 'wrap', marginBottom: '20px',
-          }}>
-            {['royal-stag', 'chivas-regal', 'jameson', 'absolut', 'martell', 'beefeater'].map(slug => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={slug}
-                src={`/logos/${slug}.png`}
-                alt={slug}
-                style={{
-                  height: 'clamp(16px, 2vw, 22px)',
-                  width: 'auto',
-                  maxWidth: '80px',
-                  objectFit: 'contain',
-                  opacity: 0.55,
-                  filter: 'brightness(10)',
-                  display: 'block',
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Main logo + tagline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <img
-              src="/images/logo-white.png"
-              alt="Pernod Ricard India"
-              style={{ height: '28px', width: 'auto', opacity: 0.75 }}
-            />
-            <span style={{
-              fontSize: '9px',
-              letterSpacing: '0.28em',
-              color: 'rgba(242,237,228,0.3)',
-              textTransform: 'uppercase',
-            }}>
-              Créateurs de convivialité
-            </span>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo-white.png"
+            alt="Pernod Ricard India"
+            style={{ width: '200px', height: 'auto', opacity: 0.85 }}
+          />
         </div>
       </div>
 
-      {/* Right — editorial color panel (hidden ≤1024px via CSS var) */}
-      <div ref={activeImg} style={{
+      {/* Right — editorial image panel with crossfade */}
+      <div style={{
         width: '38%',
-        background: 'linear-gradient(135deg,#1C2040,#0A0C14)',
-        transition: 'background 0.5s ease',
         position: 'relative',
         overflow: 'hidden',
         display: 'var(--menu-panel-display, flex)',
         flexDirection: 'column',
       }}>
+        {/* Layer 1: default image — always present underneath */}
         <div style={{
-          position: 'absolute', bottom: '-40px', right: '-20px',
-          fontFamily: 'var(--font-display)',
-          fontSize: '320px',
-          fontWeight: 300,
-          color: 'rgba(242,237,228,0.04)',
-          lineHeight: 1,
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}>PR</div>
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${DEFAULT_IMG})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }} />
 
+        {/* Layer 2: hovered image — crossfades over layer 1 */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: hoveredImg ? `url(${hoveredImg})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: hoveredImg ? 1 : 0,
+          transition: 'opacity 0.4s ease',
+        }} />
+
+        {/* Dark overlay — always on top of both image layers */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(0,0,0,0.55)',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }} />
+
+        {/* Text — above everything */}
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', flexDirection: 'column',
           justifyContent: 'center', padding: '80px 48px',
+          zIndex: 2,
         }}>
           <div style={{
             fontFamily: 'var(--font-display)',

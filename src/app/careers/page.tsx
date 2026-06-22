@@ -46,20 +46,20 @@ const PROCESS = [
 ]
 
 const BRANDS = [
-  { name: 'Chivas Regal',   cat: 'Scotch Whisky' },
-  { name: 'The Glenlivet',  cat: 'Scotch Whisky' },
-  { name: "Ballantine's",   cat: 'Scotch Whisky' },
-  { name: 'Jameson',        cat: 'Irish Whiskey' },
-  { name: 'Absolut',        cat: 'Vodka' },
-  { name: 'Beefeater',      cat: 'Gin' },
-  { name: 'Martell',        cat: 'Cognac & Brandy' },
-  { name: 'Mumm',           cat: 'Champagne' },
-  { name: 'Havana Club',    cat: 'Rum' },
-  { name: 'Royal Salute',   cat: 'Scotch Whisky' },
-  { name: 'Perrier-Jouët',  cat: 'Champagne' },
-  { name: 'Redbreast',      cat: 'Irish Whiskey' },
-  { name: 'Royal Stag',     cat: 'World Whiskies' },
-  { name: 'Monkey 47',      cat: 'Gin' },
+  { name: 'Chivas Regal',   cat: 'Scotch Whisky',   slug: 'chivas' },
+  { name: 'The Glenlivet',  cat: 'Scotch Whisky',   slug: 'the-glenlivet' },
+  { name: "Ballantine's",   cat: 'Scotch Whisky',   slug: 'ballantines' },
+  { name: 'Jameson',        cat: 'Irish Whiskey',   slug: 'jameson' },
+  { name: 'Absolut',        cat: 'Vodka',           slug: 'absolut' },
+  { name: 'Beefeater',      cat: 'Gin',             slug: 'beefeater' },
+  { name: 'Martell',        cat: 'Cognac & Brandy', slug: 'martell' },
+  { name: 'Mumm',           cat: 'Champagne',       slug: 'mumm' },
+  { name: 'Havana Club',    cat: 'Rum',             slug: 'havana-club' },
+  { name: 'Royal Salute',   cat: 'Scotch Whisky',   slug: 'royal-salute' },
+  { name: 'Perrier-Jouët',  cat: 'Champagne',       slug: 'perrier-jouet' },
+  { name: 'Redbreast',      cat: 'Irish Whiskey',   slug: 'redbreast' },
+  { name: 'Royal Stag',     cat: 'World Whiskies',  slug: 'royal-stag' },
+  { name: 'Monkey 47',      cat: 'Gin',             slug: 'monkey-47' },
 ]
 
 const FAQS = [
@@ -240,10 +240,11 @@ function FaqItem({ q, a }: { q: string; a: string }) {
   )
 }
 
-function BrandTile({ name, cat }: { name: string; cat: string }) {
+function BrandTile({ name, cat, slug }: { name: string; cat: string; slug: string }) {
   const [hov, setHov] = useState(false)
   return (
-    <div
+    <a
+      href={`/brands/${slug}`}
       data-btile
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
@@ -254,7 +255,8 @@ function BrandTile({ name, cat }: { name: string; cat: string }) {
         borderBottom: '1px solid rgba(14,14,14,0.1)',
         background: hov ? '#0E0E0E' : 'transparent',
         transition: 'background 0.25s',
-        cursor: 'default',
+        cursor: 'pointer',
+        textDecoration: 'none', display: 'block',
       }}
     >
       <div style={{
@@ -273,7 +275,7 @@ function BrandTile({ name, cat }: { name: string; cat: string }) {
       }}>
         {name}
       </div>
-    </div>
+    </a>
   )
 }
 
@@ -423,7 +425,7 @@ export default function CareersPage() {
         <div style={{ height: '1px', background: 'rgba(14,14,14,0.1)', marginBottom: 'clamp(28px,4vh,44px)' }} />
 
         <div data-hlbl style={{ opacity: 0, marginBottom: '14px' }}>
-          <span style={{ fontSize: '8px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A' }}>
+          <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A' }}>
             Working at Pernod Ricard India
           </span>
         </div>
@@ -524,7 +526,7 @@ export default function CareersPage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(44px,7vh,80px)' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             What we value
           </p>
           <div style={{
@@ -584,7 +586,7 @@ export default function CareersPage() {
       <div style={{ background: '#0E0E0E', borderTop: '1px solid rgba(242,237,228,0.06)' }}>
         <div style={{ padding: 'clamp(40px,5vh,56px) clamp(24px,6vw,80px) 0' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
               Why build here
             </p>
             <div style={{
@@ -631,7 +633,7 @@ export default function CareersPage() {
           justifyContent: 'space-between', flexWrap: 'wrap',
           gap: '20px', marginBottom: 'clamp(44px,6vh,64px)',
         }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             Where you could grow
           </p>
           <div style={{
@@ -660,7 +662,7 @@ export default function CareersPage() {
         textAlign: 'center',
         borderTop: '1px solid rgba(242,237,228,0.06)',
       }}>
-        <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 clamp(20px,3vh,32px)' }}>
+        <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 clamp(20px,3vh,32px)' }}>
           Life here
         </p>
         <div style={{
@@ -708,7 +710,7 @@ export default function CareersPage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(44px,6vh,64px)' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             Where you would work
           </p>
           <div style={{
@@ -771,7 +773,7 @@ export default function CareersPage() {
           borderTop: '1px solid rgba(242,237,228,0.06)',
         }}
       >
-        <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 clamp(12px,1.5vh,20px)' }}>
+        <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 clamp(12px,1.5vh,20px)' }}>
           Express your interest
         </p>
         <div style={{
@@ -1005,7 +1007,7 @@ export default function CareersPage() {
       >
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', marginBottom: 'clamp(40px,6vh,60px)' }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 12px' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 12px' }}>
               Brands in focus
             </p>
             <div style={{
@@ -1052,7 +1054,7 @@ export default function CareersPage() {
         borderTop: '1px solid rgba(242,237,228,0.06)',
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(40px,6vh,64px)' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             Answers
           </p>
           <div style={{

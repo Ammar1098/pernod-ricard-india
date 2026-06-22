@@ -94,9 +94,10 @@ export default function KeywordSection({
       {/* content above the parallax layers */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <p style={{
-          fontSize: '10px',
-          letterSpacing: '0.35em',
+          fontSize: '13px',
+          letterSpacing: '0.2em',
           textTransform: 'uppercase',
+          fontWeight: 500,
           color: '#BFA05A',
           marginBottom: 'clamp(16px, 3vh, 32px)',
         }}>

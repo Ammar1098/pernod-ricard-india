@@ -96,8 +96,8 @@ export default function BrandsSection() {
       {/* ── TOP LABEL ── */}
       <div style={{
         position: 'absolute', top: 'clamp(24px, 4vh, 40px)', left: 'clamp(24px, 5vw, 56px)',
-        zIndex: 10, fontSize: '9px', letterSpacing: '0.35em',
-        textTransform: 'uppercase', color: '#BFA05A', pointerEvents: 'none',
+        zIndex: 10, fontSize: '13px', letterSpacing: '0.2em',
+        textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', pointerEvents: 'none',
       }}>
         A house of brands
       </div>
@@ -141,12 +141,12 @@ export default function BrandsSection() {
         position: 'absolute', bottom: 'clamp(32px, 5vh, 56px)', right: 'clamp(24px, 5vw, 56px)',
         zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px',
       }}>
-        <span style={{ fontSize: '8px', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(14,14,14,0.3)' }}>
+        <span style={{ fontSize: '13px', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(14,14,14,0.3)' }}>
           drag to explore
         </span>
         <a
           href="/brands"
-          style={{ fontSize: '8px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#BFA05A', textDecoration: 'none', opacity: 0.7, transition: 'opacity 0.2s' }}
+          style={{ fontSize: '13px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#BFA05A', textDecoration: 'none', opacity: 0.7, transition: 'opacity 0.2s' }}
           onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
           onMouseLeave={e => (e.currentTarget.style.opacity = '0.7')}
         >

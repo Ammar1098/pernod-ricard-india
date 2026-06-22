@@ -65,20 +65,20 @@ const FAQS = [
 ]
 
 const BRANDS = [
-  { name: 'Chivas Regal',   cat: 'Scotch Whisky' },
-  { name: 'The Glenlivet',  cat: 'Scotch Whisky' },
-  { name: "Ballantine's",   cat: 'Scotch Whisky' },
-  { name: 'Jameson',        cat: 'Irish Whiskey' },
-  { name: 'Absolut',        cat: 'Vodka' },
-  { name: 'Beefeater',      cat: 'Gin' },
-  { name: 'Martell',        cat: 'Cognac & Brandy' },
-  { name: 'Mumm',           cat: 'Champagne' },
-  { name: 'Havana Club',    cat: 'Rum' },
-  { name: 'Royal Salute',   cat: 'Scotch Whisky' },
-  { name: 'Perrier-Jouët',  cat: 'Champagne' },
-  { name: 'Redbreast',      cat: 'Irish Whiskey' },
-  { name: 'Royal Stag',     cat: 'World Whiskies' },
-  { name: 'Monkey 47',      cat: 'Gin' },
+  { name: 'Chivas Regal',   cat: 'Scotch Whisky',   slug: 'chivas' },
+  { name: 'The Glenlivet',  cat: 'Scotch Whisky',   slug: 'the-glenlivet' },
+  { name: "Ballantine's",   cat: 'Scotch Whisky',   slug: 'ballantines' },
+  { name: 'Jameson',        cat: 'Irish Whiskey',   slug: 'jameson' },
+  { name: 'Absolut',        cat: 'Vodka',           slug: 'absolut' },
+  { name: 'Beefeater',      cat: 'Gin',             slug: 'beefeater' },
+  { name: 'Martell',        cat: 'Cognac & Brandy', slug: 'martell' },
+  { name: 'Mumm',           cat: 'Champagne',       slug: 'mumm' },
+  { name: 'Havana Club',    cat: 'Rum',             slug: 'havana-club' },
+  { name: 'Royal Salute',   cat: 'Scotch Whisky',   slug: 'royal-salute' },
+  { name: 'Perrier-Jouët',  cat: 'Champagne',       slug: 'perrier-jouet' },
+  { name: 'Redbreast',      cat: 'Irish Whiskey',   slug: 'redbreast' },
+  { name: 'Royal Stag',     cat: 'World Whiskies',  slug: 'royal-stag' },
+  { name: 'Monkey 47',      cat: 'Gin',             slug: 'monkey-47' },
 ]
 
 /* ── sub-components ── */
@@ -204,10 +204,11 @@ function EssentialRow({ num, title }: typeof ESSENTIALS[0]) {
   )
 }
 
-function BrandTile({ name, cat }: { name: string; cat: string }) {
+function BrandTile({ name, cat, slug }: { name: string; cat: string; slug: string }) {
   const [hov, setHov] = useState(false)
   return (
-    <div
+    <a
+      href={`/brands/${slug}`}
       data-btile
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
@@ -218,7 +219,8 @@ function BrandTile({ name, cat }: { name: string; cat: string }) {
         borderBottom: '1px solid rgba(14,14,14,0.1)',
         background: hov ? '#0E0E0E' : 'transparent',
         transition: 'background 0.25s',
-        cursor: 'default',
+        cursor: 'pointer',
+        textDecoration: 'none', display: 'block',
       }}
     >
       <div style={{ fontSize: '7px', letterSpacing: '0.35em', textTransform: 'uppercase', color: hov ? 'rgba(191,160,90,0.7)' : 'rgba(14,14,14,0.3)', marginBottom: '8px', transition: 'color 0.25s' }}>
@@ -233,7 +235,7 @@ function BrandTile({ name, cat }: { name: string; cat: string }) {
       }}>
         {name}
       </div>
-    </div>
+    </a>
   )
 }
 
@@ -356,7 +358,7 @@ export default function InvestorsPage() {
         <div data-hlbl style={{ opacity: 0, display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '14px' }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(10px,1vw,14px)', color: 'rgba(14,14,14,0.25)', letterSpacing: '0.05em' }}>04</span>
           <div style={{ width: '20px', height: '1px', background: 'rgba(14,14,14,0.2)' }} />
-          <span style={{ fontSize: '8px', letterSpacing: '0.45em', textTransform: 'uppercase', color: '#BFA05A' }}>Investors</span>
+          <span style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A' }}>Investors</span>
         </div>
 
         <h1 style={{
@@ -476,7 +478,7 @@ export default function InvestorsPage() {
         padding: 'clamp(80px,13vh,160px) clamp(24px,8vw,120px)',
         borderTop: '1px solid rgba(242,237,228,0.04)',
       }}>
-        <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 clamp(24px,3.5vh,40px)' }}>
+        <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 clamp(24px,3.5vh,40px)' }}>
           Long-term value
         </p>
         <div style={{
@@ -511,7 +513,7 @@ export default function InvestorsPage() {
         {/* heading */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(32px,5vh,56px)' }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 14px' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 14px' }}>
               Reports & Results
             </p>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px,4vw,64px)', fontWeight: 300, letterSpacing: '-0.03em', lineHeight: 0.9, color: '#0E0E0E' }}>
@@ -599,7 +601,7 @@ export default function InvestorsPage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(44px,6vh,64px)' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>
             Investor essentials
           </p>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px,3vw,44px)', fontWeight: 300, letterSpacing: '-0.03em', lineHeight: 0.9, color: '#0E0E0E', textAlign: 'right' }}>
@@ -621,7 +623,7 @@ export default function InvestorsPage() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px',
         }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 10px' }}>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 10px' }}>
               Investor relations
             </p>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(16px,1.8vw,26px)', fontWeight: 300, letterSpacing: '-0.01em', color: '#F2EDE4' }}>
@@ -655,7 +657,7 @@ export default function InvestorsPage() {
       >
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px', marginBottom: 'clamp(40px,6vh,60px)' }}>
           <div>
-            <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: '0 0 14px' }}>Brands in focus</p>
+            <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: '0 0 14px' }}>Brands in focus</p>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px,4vw,60px)', fontWeight: 300, letterSpacing: '-0.03em', lineHeight: 0.9, color: '#0E0E0E' }}>
               The brands behind<br />
               <em style={{ color: 'rgba(14,14,14,0.2)', fontStyle: 'italic' }}>the equity story.</em>
@@ -682,7 +684,7 @@ export default function InvestorsPage() {
         borderTop: '1px solid rgba(242,237,228,0.06)',
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px', marginBottom: 'clamp(40px,6vh,64px)' }}>
-          <p style={{ fontSize: '8px', letterSpacing: '0.4em', textTransform: 'uppercase', color: '#BFA05A', margin: 0 }}>Answers</p>
+          <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', margin: 0 }}>Answers</p>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px,3.5vw,52px)', fontWeight: 300, letterSpacing: '-0.03em', lineHeight: 0.9, color: '#F2EDE4', textAlign: 'right' }}>
             For investors,<br /><em style={{ color: 'rgba(242,237,228,0.2)', fontStyle: 'italic' }}>answered.</em>
           </div>

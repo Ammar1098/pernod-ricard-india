@@ -32,7 +32,7 @@ export default function SustainabilitySection() {
         pointerEvents: 'none', userSelect: 'none',
       }}>2030</div>
 
-      <p style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: '#BFA05A', marginBottom: 'clamp(24px, 4vh, 48px)' }}>
+      <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', marginBottom: 'clamp(24px, 4vh, 48px)' }}>
         Sustainability &amp; Responsibility · 2030 Roadmap
       </p>
 

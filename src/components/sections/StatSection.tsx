@@ -45,7 +45,7 @@ export default function StatSection() {
       borderTop: '1px solid rgba(14,14,14,0.08)',
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <p style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#BFA05A', marginBottom: 'clamp(32px, 5vh, 80px)' }}>
+      <p style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 500, color: '#BFA05A', marginBottom: 'clamp(32px, 5vh, 80px)' }}>
         By the numbers
       </p>
       <div style={{
